@@ -13,3 +13,19 @@ chmod +X vatsim-data-fetcher
 #Run the binary
 ./vatsim-data-fetcher
 ```
+
+#Required before PSQL if using bash.
+```bash
+#PSQL terminal 
+psql
+
+#Create the new database within PSQL
+CREATE DATABASE vatdb;
+
+# Exit PSQL terminal
+\q
+```
+
+```
+docker-compose up --build
+```

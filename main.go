@@ -7,6 +7,8 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"path/filepath"
+	"strconv"
 	"time"
 
 	"github.com/jackc/pgx/v5"
@@ -22,11 +24,11 @@ func main() {
 	}
 	DB_PASSWORD := os.Getenv("DB_USER")
 	if DB_PASSWORD == "" {
-		DB_PASSWORD = ""
+		DB_PASSWORD = "theoa"
 	}
 	DB_HOST := os.Getenv("DB_USER")
 	if DB_HOST == "" {
-		DB_HOST = "localhost"
+		DB_HOST = "127.0.0.1"
 	}
 	DB_PORT := os.Getenv("DB_USER")
 	if DB_PORT == "" {
@@ -36,21 +38,43 @@ func main() {
 	if DB_NAME == "" {
 		DB_NAME = "vatdb"
 	}
+	SLEEP_TIME := os.Getenv("SLEEP_TIME")
+	if SLEEP_TIME == "" {
+		SLEEP_TIME = strconv.Itoa(30)
+	}
+	s, err := strconv.Atoi(SLEEP_TIME)
+	if err != nil {
+		panic(err)
+	}
 
-	connString := fmt.Sprintf("user=%s password=%s host=%s port=%s dbname=%s ", DB_USER, DB_PASSWORD, DB_HOST, DB_PORT, DB_NAME)
+	connString := fmt.Sprintf("host=%s user=%s password=%s port=%s dbname=%s sslmode=disable ", "postgres", DB_USER, DB_PASSWORD, DB_PORT, DB_NAME)
 
 	ctx := context.Background()
 	conn, err := pgx.Connect(ctx, connString)
 	if err != nil {
 		panic(err)
 	}
+
+	schema := filepath.Join("schema.sql")
+
+	c, err := ioutil.ReadFile(schema)
+	if err != nil {
+		panic(err)
+	}
+	sql := string(c)
+	_, err = conn.Exec(ctx, sql)
+	if err != nil {
+		fmt.Println("Error implementing schema")
+		panic(err)
+	}
+
 	defer conn.Close(ctx)
 	queries := vatdb.New(conn)
 
 	// Main subroutine loop
 	for {
 		go fetchVatsimData(ctx, queries)
-		time.Sleep(30 * time.Second)
+		time.Sleep(time.Duration(s) * time.Second)
 	}
 }
 
