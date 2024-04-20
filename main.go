@@ -47,6 +47,11 @@ func main() {
 		panic(err)
 	}
 
+	// Let the Postgress container wake up
+	// This line just reduces logs
+	
+	time.Sleep(10 * time.Second)
+
 	connString := fmt.Sprintf("host=%s user=%s password=%s port=%s dbname=%s sslmode=disable ", "postgres", DB_USER, DB_PASSWORD, DB_PORT, DB_NAME)
 
 	ctx := context.Background()

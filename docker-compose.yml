@@ -4,6 +4,7 @@ services:
     ports:
       - 5432:5432
     volumes:
+      - ./postgres-data:/var/lib/postgresql/data
       - ./pg_hba.conf:/var/lib/postgresql/pg_hba.conf
     environment:
       - POSTGRES_PASSWORD=theoa
@@ -23,6 +24,7 @@ services:
       - POSTGRES_USER=theoa
       - POSTGRES_PASSWORD=theoa
       - POSTGRES_DB=vatdb
+      - SLEEP_TIME=30
     networks:
       - postgres-db-network
     restart: unless-stopped

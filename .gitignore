@@ -5,3 +5,4 @@
 vdb
 test
 /vendor
+/postgres-data
